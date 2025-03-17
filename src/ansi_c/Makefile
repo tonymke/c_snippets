@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-SRC := hash.c prime_po2s.c
+SRC := hash.c hashtable.c prime_po2s.c
 
 OBJ := $(patsubst %.c,%.o,$(SRC))
 
@@ -11,3 +11,4 @@ clean:
 
 hash.o: hash.h
 prime_po2s.o: prime_po2s.h
+hashtable.o: hashtable.h prime_po2s.h
