@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-CFLAGS := $(subst -std=c99,-std=c90,$(CFLAGS))
+CFLAGS := $(patsubst -std=%,-std=c90,$(CFLAGS))
 
 SRC := hash.c hashtable.c logging.c prime_po2s.c
 
