@@ -11,3 +11,6 @@ clean:
 
 src:
 	$(MAKE) -C src all
+
+src/%:
+	$(MAKE) -C src $(patsubst src/%,%,$@)

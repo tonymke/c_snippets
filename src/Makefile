@@ -7,3 +7,6 @@ ansi_c:
 
 clean:
 	$(MAKE) -C ansi_c clean
+
+ansi_c/%:
+	$(MAKE) -C ansi_c $(patsubst ansi_c/%,%,$@)
