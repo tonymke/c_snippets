@@ -1,5 +1,5 @@
-#ifndef LOGGING_H
-#define LOGGING_H
+#ifndef LOG_H
+#define LOG_H
 
 enum log_level {
 	LOG_LEVEL_EMERG = 0,
@@ -165,4 +165,4 @@ void log_level_set(enum log_level lvl);
 #define log_warn5(FMT, A1, A2, A3, A4, A5) \
 	log_emit(LOG_LEVEL_WARN, __FILE__, __LINE__, FMT, A1, A2, A3, A4, A5)
 
-#endif /* LOGGING_H */
+#endif /* LOG_H */

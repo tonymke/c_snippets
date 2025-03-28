@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "logging.h"
+#include "log.h"
 #include "string_utils.h"
 
-#ifndef LOGGING_LEVEL_INITIAL
-#define LOGGING_LEVEL_INITIAL LOG_LEVEL_WARNING
+#ifndef LOG_LEVEL_INITIAL
+#define LOG_LEVEL_INITIAL LOG_LEVEL_WARNING
 #endif
 
-static enum log_level current_lvl = LOGGING_LEVEL_INITIAL;
+static enum log_level current_lvl = LOG_LEVEL_INITIAL;
 
 static int is_valid_log_level(enum log_level lvl);
 static const char *log_level_s(enum log_level lvl);
