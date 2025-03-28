@@ -2,31 +2,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hashtable.h"
+#include "htable.h"
 #include "prime_po2s.h"
 
-#define HASHTABLE_ABSOLUTE_MINIMUM_CAP 2U
-#define HASHTABLE_LOWER_LOAD_FACTOR_BOUND 0.15
-#define HASHTABLE_UPPER_LOAD_FACTOR_BOUND 0.75
+#ifndef HTABLE_ABSOLUTE_MINIMUM_CAP
+#define HTABLE_ABSOLUTE_MINIMUM_CAP 2U
+#endif
+
+#ifndef HTABLE_LOWER_LOAD_FACTOR_BOUND
+#define HTABLE_LOWER_LOAD_FACTOR_BOUND 0.15
+#endif
+
+#ifndef HTABLE_UPPER_LOAD_FACTOR_BOUND
+#define HTABLE_UPPER_LOAD_FACTOR_BOUND 0.75
+#endif
 
 static const struct load_factor_bounds {
 	double lower, upper;
 } load_factor_bounds = {
-	HASHTABLE_LOWER_LOAD_FACTOR_BOUND, /* lower */
-	HASHTABLE_UPPER_LOAD_FACTOR_BOUND /* upper */
+	HTABLE_LOWER_LOAD_FACTOR_BOUND, /* lower */
+	HTABLE_UPPER_LOAD_FACTOR_BOUND /* upper */
 };
 
-struct hashtable_t {
+struct htable_t {
 	size_t len, min_cap, cap;
-	struct hashtable_bucket {
+	struct htable_bucket {
 		short in_use;
 		size_t hash;
 		void *key, *value;
 	} *buckets;
 
-	hashtable_cmp_fn cmp_key; /* required */
-	hashtable_hash_fn hash_key; /* required */
-	hashtable_destroy_fn destroy_key, destroy_val; /* optional */
+	htable_cmp_fn cmp_key; /* required */
+	htable_hash_fn hash_key; /* required */
+	htable_destroy_fn destroy_key, destroy_val; /* optional */
 };
 
 /*
@@ -34,7 +42,7 @@ struct hashtable_t {
 * is updated accordingly, but no resizing or free is performed on ht->buckets
 * itself.
 */
-static void destroy_key_values(hashtable_t *ht);
+static void destroy_key_values(htable_t *ht);
 
 /* Locate the bucket for the provided hash and key.
 
@@ -42,20 +50,20 @@ If the caller has already hashed the key, it may provide it.
 
 Only returns NULL if the buckets array is not allocated at all.
 */
-static struct hashtable_bucket *
-find_bucket_by_key(hashtable_t *ht, void *key, const size_t *precomputed_hash);
+static struct htable_bucket *find_bucket_by_key(htable_t *ht, void *key,
+						const size_t *precomputed_hash);
 
 /*
  * Inspect the given pointer and return non-zero if it points
  * to a hashtable in a valid state.
  */
-static int is_valid_hashtable(hashtable_t *ht);
+static int is_valid_htable(htable_t *ht);
 
 /*
  * Inspect the given pointer and return non-zero if it points to a bucket
  * in a valid state.
  */
-static int is_valid_bucket(struct hashtable_bucket *b);
+static int is_valid_bucket(struct htable_bucket *b);
 
 /*
 * Determine the optimal capacity for bucketing the given minimum
@@ -78,15 +86,14 @@ static size_t optimal_cap(size_t min_cap, size_t len,
  * 
  * A non-zero return-value indicates reallocation failure.
  */
-static int optimize_buckets_for_len(struct hashtable_t *ht, size_t new_len,
+static int optimize_buckets_for_len(struct htable_t *ht, size_t new_len,
 				    const struct load_factor_bounds *lfb);
 
-hashtable_t *hashtable_create(size_t min_cap, hashtable_hash_fn hash_key,
-			      hashtable_cmp_fn cmp_key,
-			      hashtable_destroy_fn destroy_key,
-			      hashtable_destroy_fn destroy_val)
+htable_t *htable_create(size_t min_cap, htable_hash_fn hash_key,
+			htable_cmp_fn cmp_key, htable_destroy_fn destroy_key,
+			htable_destroy_fn destroy_val)
 {
-	hashtable_t *ht = NULL;
+	htable_t *ht = NULL;
 
 	assert(hash_key != NULL);
 	assert(cmp_key != NULL);
@@ -120,48 +127,48 @@ error:
 	return NULL;
 }
 
-void hashtable_destroy(hashtable_t *ht)
+void htable_destroy(htable_t *ht)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	destroy_key_values(ht);
 	free(ht->buckets);
 	free(ht);
 }
 
-size_t hashtable_min_cap(hashtable_t *ht)
+size_t htable_min_cap(htable_t *ht)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	return ht->min_cap;
 }
 
-int hashtable_set_min_cap(hashtable_t *ht, size_t new_min_cap)
+int htable_set_min_cap(htable_t *ht, size_t new_min_cap)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	ht->min_cap = new_min_cap;
 
 	return optimize_buckets_for_len(ht, ht->len, &load_factor_bounds);
 }
 
-size_t hashtable_cap(hashtable_t *ht)
+size_t htable_cap(htable_t *ht)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	return ht->cap;
 }
 
-size_t hashtable_len(hashtable_t *ht)
+size_t htable_len(htable_t *ht)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	return ht->len;
 }
 
-int hashtable_clear(hashtable_t *ht)
+int htable_clear(htable_t *ht)
 {
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	destroy_key_values(ht);
 	assert(!ht->len);
@@ -169,11 +176,11 @@ int hashtable_clear(hashtable_t *ht)
 	return optimize_buckets_for_len(ht, ht->len, &load_factor_bounds);
 }
 
-int hashtable_contains(hashtable_t *ht, void *key)
+int htable_contains(htable_t *ht, void *key)
 {
-	struct hashtable_bucket *b;
+	struct htable_bucket *b;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	b = find_bucket_by_key(ht, key, NULL);
 	if (b == NULL) {
@@ -183,11 +190,11 @@ int hashtable_contains(hashtable_t *ht, void *key)
 	return !!b->in_use;
 }
 
-void *hashtable_get(hashtable_t *ht, void *key)
+void *htable_get(htable_t *ht, void *key)
 {
-	struct hashtable_bucket *b;
+	struct htable_bucket *b;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	b = find_bucket_by_key(ht, key, NULL);
 	if (b == NULL) {
@@ -202,11 +209,11 @@ void *hashtable_get(hashtable_t *ht, void *key)
 	return b->value;
 }
 
-int hashtable_remove(hashtable_t *ht, void *key)
+int htable_remove(htable_t *ht, void *key)
 {
-	struct hashtable_bucket *b;
+	struct htable_bucket *b;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	b = find_bucket_by_key(ht, key, NULL);
 	if (b == NULL)
@@ -235,13 +242,13 @@ int hashtable_remove(hashtable_t *ht, void *key)
 	return 1;
 }
 
-int hashtable_set(hashtable_t *ht, void *key, void *value)
+int htable_set(htable_t *ht, void *key, void *value)
 {
-	struct hashtable_bucket *b;
+	struct htable_bucket *b;
 	short found_existing = 0;
 	size_t hash;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 	assert(ht->cap);
 	assert(ht->buckets);
 
@@ -274,14 +281,14 @@ int hashtable_set(hashtable_t *ht, void *key, void *value)
 	return found_existing;
 }
 
-static void destroy_key_values(struct hashtable_t *ht)
+static void destroy_key_values(struct htable_t *ht)
 {
 	size_t i;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	for (i = 0; ht->len && i < ht->cap; i++) {
-		struct hashtable_bucket *b = &ht->buckets[i];
+		struct htable_bucket *b = &ht->buckets[i];
 		assert(is_valid_bucket(b));
 
 		if (!b->in_use) {
@@ -303,16 +310,16 @@ static void destroy_key_values(struct hashtable_t *ht)
 	}
 }
 
-static struct hashtable_bucket *
-find_bucket_by_key(hashtable_t *ht, void *key, const size_t *precomputed_hash)
+static struct htable_bucket *find_bucket_by_key(htable_t *ht, void *key,
+						const size_t *precomputed_hash)
 {
 	/* Linear probe 
 	   TODO quadratic probe? */
 
-	struct hashtable_bucket *b;
+	struct htable_bucket *b;
 	size_t i0, i, hash;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	if (!ht->cap || ht->buckets == NULL) {
 		return NULL;
@@ -351,7 +358,7 @@ find_bucket_by_key(hashtable_t *ht, void *key, const size_t *precomputed_hash)
 	abort();
 }
 
-static int is_valid_hashtable(hashtable_t *ht)
+static int is_valid_htable(htable_t *ht)
 {
 	if (ht == NULL) {
 		return 0;
@@ -381,7 +388,7 @@ static int is_valid_hashtable(hashtable_t *ht)
 	return 1;
 }
 
-static int is_valid_bucket(struct hashtable_bucket *b)
+static int is_valid_bucket(struct htable_bucket *b)
 {
 	if (b == NULL) {
 		return 0;
@@ -410,7 +417,7 @@ static size_t optimal_cap(size_t min_cap, size_t len,
 	for (i = 0; i < prime_po2s_cap; i++) {
 		unsigned long candidate = prime_po2s[i];
 
-		if (candidate < HASHTABLE_ABSOLUTE_MINIMUM_CAP) {
+		if (candidate < HTABLE_ABSOLUTE_MINIMUM_CAP) {
 			continue;
 		}
 
@@ -448,17 +455,17 @@ static size_t optimal_cap(size_t min_cap, size_t len,
 	return 0;
 }
 
-static int optimize_buckets_for_len(struct hashtable_t *ht, size_t new_len,
+static int optimize_buckets_for_len(struct htable_t *ht, size_t new_len,
 				    const struct load_factor_bounds *lfb)
 {
-	struct hashtable_t new;
+	struct htable_t new;
 	short may_need_realloc = 0;
 	size_t i, old_len;
 
-	assert(is_valid_hashtable(ht));
+	assert(is_valid_htable(ht));
 
 	/* discern if we need to do anything */
-	if (ht->buckets == NULL || ht->cap < HASHTABLE_ABSOLUTE_MINIMUM_CAP ||
+	if (ht->buckets == NULL || ht->cap < HTABLE_ABSOLUTE_MINIMUM_CAP ||
 	    ht->cap < ht->min_cap || ht->cap < new_len) {
 		may_need_realloc = 1;
 	} else if (lfb != NULL && ht->cap) {
@@ -498,8 +505,7 @@ static int optimize_buckets_for_len(struct hashtable_t *ht, size_t new_len,
 
 	old_len = ht->len;
 	for (i = 0; old_len && i < ht->cap; i++) {
-		struct hashtable_bucket *old_bucket = &ht->buckets[i],
-					*new_bucket;
+		struct htable_bucket *old_bucket = &ht->buckets[i], *new_bucket;
 
 		if (!old_bucket->in_use) {
 			continue;
