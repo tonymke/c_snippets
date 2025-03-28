@@ -6,7 +6,7 @@
 #include <time.h>
 
 #include "log.h"
-#include "string_utils.h"
+#include "str.h"
 
 #ifndef LOG_LEVEL_INITIAL
 #define LOG_LEVEL_INITIAL LOG_LEVEL_WARNING
@@ -42,7 +42,7 @@ int log_emit(enum log_level lvl, const char *file, unsigned lineno,
 	if (now_s == NULL) {
 		return -1;
 	}
-	strutl_rstrip(now_s);
+	str_rstrip(now_s);
 
 	lvl_s = log_level_s(lvl);
 	assert(lvl_s != NULL);

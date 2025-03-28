@@ -3,13 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "string_utils.h"
+#include "str.h"
 
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)
 #endif
 
-char *strutl_dup(const char *s)
+char *str_dup(const char *s)
 {
 	char *dup;
 	size_t cap, len;
@@ -30,7 +30,7 @@ char *strutl_dup(const char *s)
 	return strcpy(dup, s);
 }
 
-size_t strutl_lstrip(char *s)
+size_t str_lstrip(char *s)
 {
 	char *cur, *first_nonspace;
 
@@ -64,7 +64,7 @@ size_t strutl_lstrip(char *s)
 	return cur - first_nonspace;
 }
 
-size_t strutl_rstrip(char *s)
+size_t str_rstrip(char *s)
 {
 	char *cur, *first_trailing_space;
 
@@ -93,7 +93,7 @@ size_t strutl_rstrip(char *s)
 	return first_trailing_space - s;
 }
 
-size_t strutl_strip(char *s)
+size_t str_strip(char *s)
 {
 	char *cur, *term, *lstrip_up_to, *rstrip_from;
 
