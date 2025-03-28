@@ -1,6 +1,8 @@
 #ifndef LOG_H
 #define LOG_H
 
+#include <stdio.h> /* for FILE */
+
 enum log_level {
 	LOG_LEVEL_EMERG = 0,
 	LOG_LEVEL_ALERT = 1,
@@ -21,6 +23,9 @@ int log_emit(enum log_level lvl, const char *file, unsigned lineno,
 
 enum log_level log_level(void);
 void log_level_set(enum log_level lvl);
+
+FILE *log_file(void);
+void log_file_set(FILE *f);
 
 #define log_emerg(FMT) log_emit(LOG_LEVEL_EMERG, __FILE__, __LINE__, FMT)
 #define log_emerg1(FMT, A1) \

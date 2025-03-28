@@ -8,10 +8,15 @@
 #include "log.h"
 #include "str.h"
 
+#ifndef LOG_FILE_INITIAL
+#define LOG_FILE_INITIAL stderr
+#endif
+
 #ifndef LOG_LEVEL_INITIAL
 #define LOG_LEVEL_INITIAL LOG_LEVEL_WARNING
 #endif
 
+static FILE *current_file = NULL;
 static enum log_level current_lvl = LOG_LEVEL_INITIAL;
 
 static int is_valid_log_level(enum log_level lvl);
@@ -47,7 +52,7 @@ int log_emit(enum log_level lvl, const char *file, unsigned lineno,
 	lvl_s = log_level_s(lvl);
 	assert(lvl_s != NULL);
 
-	written = fprintf(stderr,
+	written = fprintf(log_file(),
 			  ("[%s]" /* time */
 			   " "
 			   "%s" /* level */
@@ -90,6 +95,20 @@ void log_level_set(enum log_level lvl)
 	assert(is_valid_log_level(lvl));
 
 	current_lvl = lvl;
+}
+
+FILE *log_file(void)
+{
+	if (current_file == NULL) {
+		log_file_set(LOG_FILE_INITIAL);
+	}
+	return current_file;
+}
+
+void log_file_set(FILE *f)
+{
+	assert(f != NULL);
+	current_file = f;
 }
 
 static int is_valid_log_level(enum log_level lvl)
