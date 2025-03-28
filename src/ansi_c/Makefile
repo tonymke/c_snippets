@@ -13,6 +13,6 @@ clean:
 
 hash.o: hash.h
 hashtable.o: hashtable.h prime_po2s.h
-logging.o: logging.h
+logging.o: logging.h string_utils.h
 prime_po2s.o: prime_po2s.h
 string_utils.o: string_utils.h

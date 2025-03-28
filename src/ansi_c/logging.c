@@ -1,13 +1,12 @@
 #include <assert.h>
-#include <ctype.h>
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
 #include "logging.h"
+#include "string_utils.h"
 
 #ifndef LOGGING_LEVEL_INITIAL
 #define LOGGING_LEVEL_INITIAL LOG_LEVEL_WARNING
@@ -17,7 +16,6 @@ static enum log_level current_lvl = LOGGING_LEVEL_INITIAL;
 
 static int is_valid_log_level(enum log_level lvl);
 static const char *log_level_s(enum log_level lvl);
-static char *rstrip(char *s);
 
 int log_emit(enum log_level lvl, const char *file, unsigned lineno,
 	     const char *fmt, ...)
@@ -40,10 +38,11 @@ int log_emit(enum log_level lvl, const char *file, unsigned lineno,
 	if (now == (time_t)-1) {
 		return -1;
 	}
-	now_s = rstrip(ctime(&now));
+	now_s = ctime(&now);
 	if (now_s == NULL) {
 		return -1;
 	}
+	strutl_rstrip(now_s);
 
 	lvl_s = log_level_s(lvl);
 	assert(lvl_s != NULL);
@@ -117,33 +116,4 @@ static const char *log_level_s(enum log_level lvl)
 
 	assert(is_valid_log_level(lvl));
 	return level_ss[lvl];
-}
-
-static char *rstrip(char *s)
-{
-	char *cur, *ws_start;
-
-	if (s == NULL) {
-		return NULL;
-	}
-
-	ws_start = NULL;
-	cur = s;
-	while (*cur != '\0') {
-		if (isspace(*cur)) {
-			if (ws_start == NULL) {
-				ws_start = cur;
-			}
-		} else {
-			ws_start = NULL;
-		}
-		cur++;
-	}
-
-	if (ws_start != NULL) {
-		*ws_start = '\0';
-		cur = ws_start;
-	}
-
-	return s;
 }
