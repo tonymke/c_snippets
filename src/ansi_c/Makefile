@@ -1,6 +1,7 @@
 .PHONY: all clean
 
 CFLAGS := $(patsubst -std=%,-std=c90,$(CFLAGS))
+LDFLAGS := -lm # log.h uses math.h
 
 SRC := hash.c htable.c log.c prime_po2s.c str.c
 
