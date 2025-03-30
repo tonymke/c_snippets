@@ -1,15 +1,11 @@
 c\_snippets
 ===========
 
-A collection of reusable C code snippets meant for easy copying into projects.
+Snippets are my repositories of things I've had to type several times before and
+decided to leave them somewhere handy for when I have to do so again in the
+future.
 
-Or, things I've had to type several times before and decided to leave them
-somewhere handy for when I have to do so again in the future.
-
-These tend to be things I would normally grab from a library, but cannot use it
-in a particular environment I'm working in (usually Borland Turbo C for DOS).
-So you'll see things like strict C90 conformance and workarounds for that kind
-of world.
+This is the one for C.
 
 License
 -------
