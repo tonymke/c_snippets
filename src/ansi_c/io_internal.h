@@ -20,41 +20,41 @@
 #define FLAG_SIGN_CH '+'
 #define FLAG_SPACE_CH ' '
 
-enum conv_spec {
-	CONV_SPEC_FLT_AUTO, /* g */
-	CONV_SPEC_FLT_AUTO_UP, /* G */
-	CONV_SPEC_FLT_DEC, /* f */
-	CONV_SPEC_FLT_SCI, /* e */
-	CONV_SPEC_FLT_SCI_UP, /* E */
-	CONV_SPEC_OUT_WRITTEN, /* n */
-	CONV_SPEC_PERCENT_LITERAL, /* % */
-	CONV_SPEC_PTR, /* p */
-	CONV_SPEC_SINT_AUTO, /* i */
-	CONV_SPEC_SINT_DEC, /* d */
-	CONV_SPEC_STR, /* s */
-	CONV_SPEC_UCHAR, /* c */
-	CONV_SPEC_UINT_DEC, /* u */
-	CONV_SPEC_UINT_HEX, /* x */
-	CONV_SPEC_UINT_HEX_UP, /* X */
-	CONV_SPEC_UINT_OCT /* o */
+enum conv_type {
+	CONV_TYPE_FLT_AUTO, /* g */
+	CONV_TYPE_FLT_AUTO_UP, /* G */
+	CONV_TYPE_FLT_DEC, /* f */
+	CONV_TYPE_FLT_SCI, /* e */
+	CONV_TYPE_FLT_SCI_UP, /* E */
+	CONV_TYPE_OUT_WRITTEN, /* n */
+	CONV_TYPE_PERCENT_LITERAL, /* % */
+	CONV_TYPE_PTR, /* p */
+	CONV_TYPE_SINT_AUTO, /* i */
+	CONV_TYPE_SINT_DEC, /* d */
+	CONV_TYPE_STR, /* s */
+	CONV_TYPE_UCHAR, /* c */
+	CONV_TYPE_UINT_DEC, /* u */
+	CONV_TYPE_UINT_HEX, /* x */
+	CONV_TYPE_UINT_HEX_UP, /* X */
+	CONV_TYPE_UINT_OCT /* o */
 };
 
-#define CONV_SPEC_FLT_AUTO_CH 'g'
-#define CONV_SPEC_FLT_AUTO_UP_CH 'G'
-#define CONV_SPEC_FLT_DEC_CH 'f'
-#define CONV_SPEC_FLT_SCI_CH 'e'
-#define CONV_SPEC_FLT_SCI_UP_CH 'E'
-#define CONV_SPEC_OUT_WRITTEN_CH 'n'
-#define CONV_SPEC_PERCENT_LITERAL_CH '%'
-#define CONV_SPEC_PTR_CH 'p'
-#define CONV_SPEC_SINT_AUTO_CH 'i'
-#define CONV_SPEC_SINT_DEC_CH 'd'
-#define CONV_SPEC_STR_CH 's'
-#define CONV_SPEC_UCHAR_CH 'c'
-#define CONV_SPEC_UINT_DEC_CH 'u'
-#define CONV_SPEC_UINT_HEX_CH 'x'
-#define CONV_SPEC_UINT_HEX_UP_CH 'X'
-#define CONV_SPEC_UINT_OCT_CH 'o'
+#define CONV_TYPE_FLT_AUTO_CH 'g'
+#define CONV_TYPE_FLT_AUTO_UP_CH 'G'
+#define CONV_TYPE_FLT_DEC_CH 'f'
+#define CONV_TYPE_FLT_SCI_CH 'e'
+#define CONV_TYPE_FLT_SCI_UP_CH 'E'
+#define CONV_TYPE_OUT_WRITTEN_CH 'n'
+#define CONV_TYPE_PERCENT_LITERAL_CH '%'
+#define CONV_TYPE_PTR_CH 'p'
+#define CONV_TYPE_SINT_AUTO_CH 'i'
+#define CONV_TYPE_SINT_DEC_CH 'd'
+#define CONV_TYPE_STR_CH 's'
+#define CONV_TYPE_UCHAR_CH 'c'
+#define CONV_TYPE_UINT_DEC_CH 'u'
+#define CONV_TYPE_UINT_HEX_CH 'x'
+#define CONV_TYPE_UINT_HEX_UP_CH 'X'
+#define CONV_TYPE_UINT_OCT_CH 'o'
 
 #define FIELD_WIDTH_NEXT_ARGUMENT_CH '*'
 
