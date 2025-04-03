@@ -93,4 +93,6 @@ struct conv_spec {
 	enum conv_type type;
 };
 
+int is_conv_spec_valid(const struct conv_spec *cs);
+
 #endif /* IO_INTERNAL_H */
