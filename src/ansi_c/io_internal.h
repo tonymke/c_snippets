@@ -73,4 +73,24 @@ enum length_mod {
 #define PRECISION_CH '.'
 #define PRECISION_WIDTH_NEXT_ARGUMENT_CH '*'
 
+/* conversion specification*/
+struct conv_spec {
+	unsigned flag_altform : 1;
+	unsigned flag_leadzero : 1;
+	unsigned flag_ljust : 1;
+	unsigned flag_sign : 1;
+	unsigned flag_space : 1;
+
+	struct conv_spec_field_size {
+		unsigned is_specified : 1;
+		unsigned use_next_arg : 1;
+		unsigned have_next_arg : 1;
+
+		unsigned val;
+	} min_width, precision;
+
+	enum length_mod length_mod;
+	enum conv_type type;
+};
+
 #endif /* IO_INTERNAL_H */
