@@ -93,26 +93,20 @@ struct conv_spec {
 int is_conv_spec_valid(const struct conv_spec *cs);
 
 /*
- * Parse the next conversion spec substring found in `s` into the given 
- * struct conv_spec out parameter.
+ * Parse the printf conversion spec substring `s`, updating the out parameter
+ * `*out_cs` with the results. If `out_next` is not NULL, `*out_next` is updated
+ * to point at the char immediately following the parsed substring.
+ * 
  *
- * If one is found and parsed:
- * - A positive value is returned.
- * - `*out_cs` is updated with the parse results.
- * - If `out_next` is not NULL, `*out_next` is updated to point at the char
- *   immediately following the parsed substring.
+ * Return value:
+ * - 0 if the conversion specifier was valid
+ * - Non-zero if s does not point to a valid conversion specifier, or if s or
+ * out_cs are NULL.
  * 
- * If no conversion spec substring is found:
- * - Zero is returned
- * - `*out_cs` is not updated
- * - If `out_next` is not NULL, `*out_next` points at `s`'s nul terminator.
+ * Errors:
  * 
- * If a conversion spec is found but invalid.
- * - A negative value is returned.
- * - The value of `*out_cs` is undefined.
- * - If `out_next` is not NULL, the value of `*out_next` is undefined.
- * 
- * If `s` or `out_cs` are NULL, the behavior is undefined.
+ * If s does not point to a valid conversion specifier, the value of `*out_next`
+ * is undefined. If `out_cs` was non-NULL, its value is undefined.
 */
 int parse_conv_spec(const char *s, struct conv_spec *out_cs,
 		    const char **out_next);

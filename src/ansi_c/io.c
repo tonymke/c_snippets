@@ -179,19 +179,8 @@ int parse_conv_spec(const char *s, struct conv_spec *out_cs,
 		return -1;
 	}
 
-	for (;;) {
-		if (*s == '\0') {
-			/* no conv spec found*/
-			if (out_next != NULL) {
-				*out_next = s;
-			}
-			return 0;
-		}
-
-		if (*s++ == CONV_SPEC_START_CH) {
-			/* conv spec found */
-			break;
-		}
+	if (*s++ != CONV_SPEC_START_CH) {
+		return -1;
 	}
 
 	memset(out_cs, 0, sizeof(*out_cs));
@@ -199,7 +188,7 @@ int parse_conv_spec(const char *s, struct conv_spec *out_cs,
 	if (*s == CONV_SPEC_START_CH) {
 		/* edge case - percent literal.  no other spec chars allowed. */
 		out_cs->type = CONV_TYPE_PERCENT_LITERAL;
-		return 1;
+		return 0;
 	} else {
 		state = FLAGS;
 	}
@@ -241,10 +230,8 @@ int parse_conv_spec(const char *s, struct conv_spec *out_cs,
 		*out_next = s;
 	}
 
-	if (state == DONE) {
-		if (is_conv_spec_valid(out_cs)) {
-			return 1;
-		}
+	if (state == DONE && is_conv_spec_valid(out_cs)) {
+		return 0;
 	}
 	return -1;
 }
