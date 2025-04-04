@@ -5,14 +5,10 @@
  * Environmental limit
  * The minimum value for the maximum number of characters produced by a single
  * conversion shall be 509. */
-#define CONV_BUF_CAP 512
-#define CONV_BUF_MAX_LEN (CONV_BUF_CAP - 1)
+#define CONV_BUF_MAX_LEN 509
+#define CONV_BUF_CAP (CONV_BUF_MAX_LEN + 1)
 
-#define FLAG_ALTFORM (1 << 0)
-#define FLAG_LEADZERO (1 << 1)
-#define FLAG_LJUST (1 << 2)
-#define FLAG_SIGN (1 << 3)
-#define FLAG_SPACE (1 << 4)
+#define CONV_SPEC_START_CH '%'
 
 #define FLAG_ALTFORM_CH '#'
 #define FLAG_LEADZERO_CH '0'
@@ -70,7 +66,7 @@ enum length_mod {
 #define LENGTH_MOD_LONGDBL_CH 'L'
 #define LENGTH_MOD_SHORT_CH 'h'
 
-#define PRECISION_CH '.'
+#define PRECISION_SEP_CH '.'
 #define PRECISION_WIDTH_NEXT_ARGUMENT_CH '*'
 
 /* conversion specification*/
@@ -86,13 +82,39 @@ struct conv_spec {
 		unsigned use_next_arg : 1;
 		unsigned have_next_arg : 1;
 
-		unsigned val;
+		unsigned long val;
 	} min_width, precision;
 
 	enum length_mod length_mod;
 	enum conv_type type;
 };
 
+/* Return whether the given conv_spec is valid. */
 int is_conv_spec_valid(const struct conv_spec *cs);
+
+/*
+ * Parse the next conversion spec substring found in `s` into the given 
+ * struct conv_spec out parameter.
+ *
+ * If one is found and parsed:
+ * - A positive value is returned.
+ * - `*out_cs` is updated with the parse results.
+ * - If `out_next` is not NULL, `*out_next` is updated to point at the char
+ *   immediately following the parsed substring.
+ * 
+ * If no conversion spec substring is found:
+ * - Zero is returned
+ * - `*out_cs` is not updated
+ * - If `out_next` is not NULL, `*out_next` points at `s`'s nul terminator.
+ * 
+ * If a conversion spec is found but invalid.
+ * - A negative value is returned.
+ * - The value of `*out_cs` is undefined.
+ * - If `out_next` is not NULL, the value of `*out_next` is undefined.
+ * 
+ * If `s` or `out_cs` are NULL, the behavior is undefined.
+*/
+int parse_conv_spec(const char *s, struct conv_spec *out_cs,
+		    const char **out_next);
 
 #endif /* IO_INTERNAL_H */
